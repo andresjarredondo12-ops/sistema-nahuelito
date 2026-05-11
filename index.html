@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,6 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 
@@ -110,6 +112,26 @@ button.action{
     font-weight:bold;
 }
 
+button.delete{
+    background:#c62828;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button.pdf{
+    background:#1976d2;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:15px;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
@@ -163,73 +185,89 @@ table th{
 <header>
 
 <div class="logo">
-    <img src="logo.jpg" alt="Logo">
 
-    <div>
-        <h1>SGC - Costillares Nahuelito</h1>
-        <p>Sistema de Gestión Completo</p>
-    </div>
+<img src="logo.jpg" alt="Logo">
+
+<div>
+<h1>SGC - Costillares Nahuelito</h1>
+<p>Sistema de Gestión Completo</p>
+</div>
+
 </div>
 
 <nav>
-    <button onclick="showSection('expedicion')">Expedición</button>
-    <button onclick="showSection('contable')">Contable</button>
-    <button onclick="showSection('stock')">Stock</button>
+<button onclick="showSection('expedicion')">Expedición</button>
+<button onclick="showSection('contable')">Contable</button>
+<button onclick="showSection('stock')">Stock</button>
 </nav>
 
 </header>
 
 <div class="container">
 
+<!-- EXPEDICION -->
+
 <div id="expedicion" class="section active">
 
 <h2>Expedición</h2>
 
 <div class="form-grid">
-    <input type="date" id="fechaExp">
-    <input type="text" id="camion" placeholder="Camión">
-    <input type="text" id="mercaderiaExp" placeholder="Mercadería">
-    <input type="number" id="pesoExp" placeholder="Peso (kg)">
+<input type="text" id="camion" placeholder="Camión">
+<input type="text" id="mercaderiaExp" placeholder="Mercadería">
+<input type="number" id="pesoExp" placeholder="Peso (kg)">
 </div>
 
 <button class="action" onclick="agregarExpedicion()">
 Registrar Salida
 </button>
 
+<button class="pdf" onclick="descargarPDFExpedicion()">
+Descargar PDF Expedición
+</button>
+
 <table>
+
 <thead>
 <tr>
-<th>Fecha</th>
+<th>Fecha y Hora</th>
 <th>Camión</th>
 <th>Mercadería</th>
 <th>Peso</th>
+<th>Acción</th>
 </tr>
 </thead>
 
 <tbody id="tablaExpedicion"></tbody>
+
 </table>
 
 </div>
+
+<!-- CONTABLE -->
 
 <div id="contable" class="section">
 
 <h2>Contable</h2>
 
 <div class="form-grid">
-    <input type="date" id="fechaContable">
 
-    <select id="tipoMovimiento">
-        <option value="Cobro">Cobro</option>
-        <option value="Gasto">Gasto</option>
-    </select>
+<select id="tipoMovimiento">
+<option value="Cobro">Cobro</option>
+<option value="Gasto">Gasto</option>
+</select>
 
-    <input type="number" id="montoContable" placeholder="Monto">
+<input type="number" id="montoContable" placeholder="Monto">
 
-    <input type="file" id="pdfFile" accept="application/pdf">
+<input type="file" id="pdfFile" accept="application/pdf">
+
 </div>
 
 <button class="action" onclick="registrarMovimiento()">
 Registrar Movimiento
+</button>
+
+<button class="pdf" onclick="descargarPDFContable()">
+Descargar PDF Contable
 </button>
 
 <div class="pdf-preview" id="pdfText">
@@ -240,10 +278,11 @@ Texto del PDF...
 
 <thead>
 <tr>
-<th>Fecha</th>
+<th>Fecha y Hora</th>
 <th>Tipo</th>
 <th>Monto</th>
 <th>PDF</th>
+<th>Acción</th>
 </tr>
 </thead>
 
@@ -257,28 +296,37 @@ Balance Total: $0
 
 </div>
 
+<!-- STOCK -->
+
 <div id="stock" class="section">
 
 <h2>Stock</h2>
 
 <div class="form-grid">
-    <input type="text" id="mercaderiaStock" placeholder="Mercadería">
-    <input type="number" id="pesoStock" placeholder="Peso disponible">
+<input type="text" id="mercaderiaStock" placeholder="Mercadería">
+<input type="number" id="pesoStock" placeholder="Peso disponible">
 </div>
 
 <button class="action" onclick="agregarStock()">
 Agregar Stock
 </button>
 
+<button class="pdf" onclick="descargarPDFStock()">
+Descargar PDF Stock
+</button>
+
 <table>
+
 <thead>
 <tr>
 <th>Mercadería</th>
 <th>Peso</th>
+<th>Acción</th>
 </tr>
 </thead>
 
 <tbody id="tablaStock"></tbody>
+
 </table>
 
 </div>
@@ -294,17 +342,26 @@ Agregar Stock
 pdfjsLib.GlobalWorkerOptions.workerSrc =
 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+const { jsPDF } = window.jspdf;
+
 let expediciones = JSON.parse(localStorage.getItem('expediciones')) || [];
 let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
 let stock = JSON.parse(localStorage.getItem('stock')) || [];
 
 function guardarDatos(){
+
     localStorage.setItem('expediciones', JSON.stringify(expediciones));
     localStorage.setItem('movimientos', JSON.stringify(movimientos));
     localStorage.setItem('stock', JSON.stringify(stock));
 }
 
+function fechaHoraActual(){
+
+    return new Date().toLocaleString();
+}
+
 function showSection(id){
+
     document.querySelectorAll('.section')
     .forEach(sec => sec.classList.remove('active'));
 
@@ -317,7 +374,7 @@ function renderExpediciones(){
 
     tabla.innerHTML = '';
 
-    expediciones.forEach(e => {
+    expediciones.forEach((e,index) => {
 
         tabla.innerHTML += `
         <tr>
@@ -325,6 +382,12 @@ function renderExpediciones(){
             <td>${e.camion}</td>
             <td>${e.mercaderia}</td>
             <td>${e.peso} kg</td>
+            <td>
+                <button class="delete"
+                onclick="eliminarExpedicion(${index})">
+                Eliminar
+                </button>
+            </td>
         </tr>
         `;
     });
@@ -336,12 +399,18 @@ function renderStock(){
 
     tabla.innerHTML = '';
 
-    stock.forEach(s => {
+    stock.forEach((s,index) => {
 
         tabla.innerHTML += `
         <tr>
             <td>${s.nombre}</td>
             <td>${s.peso} kg</td>
+            <td>
+                <button class="delete"
+                onclick="eliminarStock(${index})">
+                Eliminar
+                </button>
+            </td>
         </tr>
         `;
     });
@@ -355,7 +424,7 @@ function renderMovimientos(){
 
     let balance = 0;
 
-    movimientos.forEach(m => {
+    movimientos.forEach((m,index) => {
 
         tabla.innerHTML += `
         <tr>
@@ -363,6 +432,12 @@ function renderMovimientos(){
             <td>${m.tipo}</td>
             <td>$${m.monto}</td>
             <td>${m.pdf}</td>
+            <td>
+                <button class="delete"
+                onclick="eliminarMovimiento(${index})">
+                Eliminar
+                </button>
+            </td>
         </tr>
         `;
 
@@ -386,26 +461,42 @@ function agregarStock(){
     Number(document.getElementById('pesoStock').value);
 
     if(!nombre || !peso){
+
         alert('Complete los datos');
         return;
     }
 
-    const existente = stock.find(s => s.nombre === nombre);
+    const existente =
+    stock.find(s => s.nombre === nombre);
 
     if(existente){
+
         existente.peso += peso;
+
     } else {
-        stock.push({nombre,peso});
+
+        stock.push({
+            nombre,
+            peso
+        });
     }
 
     guardarDatos();
     renderStock();
 }
 
-function agregarExpedicion(){
+function eliminarStock(index){
 
-    const fecha =
-    document.getElementById('fechaExp').value;
+    if(confirm('¿Eliminar stock?')){
+
+        stock.splice(index,1);
+
+        guardarDatos();
+        renderStock();
+    }
+}
+
+function agregarExpedicion(){
 
     const camion =
     document.getElementById('camion').value;
@@ -416,14 +507,17 @@ function agregarExpedicion(){
     const peso =
     Number(document.getElementById('pesoExp').value);
 
-    const item = stock.find(s => s.nombre === mercaderia);
+    const item =
+    stock.find(s => s.nombre === mercaderia);
 
     if(!item){
+
         alert('No existe stock');
         return;
     }
 
     if(item.peso < peso){
+
         alert('Stock insuficiente');
         return;
     }
@@ -431,7 +525,8 @@ function agregarExpedicion(){
     item.peso -= peso;
 
     expediciones.push({
-        fecha,
+
+        fecha: fechaHoraActual(),
         camion,
         mercaderia,
         peso
@@ -443,10 +538,30 @@ function agregarExpedicion(){
     renderStock();
 }
 
-async function registrarMovimiento(){
+function eliminarExpedicion(index){
 
-    const fecha =
-    document.getElementById('fechaContable').value;
+    if(confirm('¿Eliminar expedición?')){
+
+        const exp = expediciones[index];
+
+        const item =
+        stock.find(s => s.nombre === exp.mercaderia);
+
+        if(item){
+
+            item.peso += Number(exp.peso);
+        }
+
+        expediciones.splice(index,1);
+
+        guardarDatos();
+
+        renderExpediciones();
+        renderStock();
+    }
+}
+
+async function registrarMovimiento(){
 
     const tipo =
     document.getElementById('tipoMovimiento').value;
@@ -485,6 +600,7 @@ async function registrarMovimiento(){
                 await page.getTextContent();
 
                 content.items.forEach(item => {
+
                     texto += item.str + ' ';
                 });
             }
@@ -497,7 +613,8 @@ async function registrarMovimiento(){
     }
 
     movimientos.push({
-        fecha,
+
+        fecha: fechaHoraActual(),
         tipo,
         monto,
         pdf: pdfNombre
@@ -508,6 +625,119 @@ async function registrarMovimiento(){
     renderMovimientos();
 }
 
+function eliminarMovimiento(index){
+
+    if(confirm('¿Eliminar movimiento?')){
+
+        movimientos.splice(index,1);
+
+        guardarDatos();
+
+        renderMovimientos();
+    }
+}
+
+/* ===========================
+   PDF STOCK
+=========================== */
+
+function descargarPDFStock(){
+
+    const doc = new jsPDF();
+
+    doc.text('Reporte de Stock',10,10);
+
+    let y = 20;
+
+    stock.forEach(s => {
+
+        doc.text(
+        `${s.nombre} - ${s.peso} kg`,
+        10,
+        y
+        );
+
+        y += 10;
+    });
+
+    doc.save('stock.pdf');
+}
+
+/* ===========================
+   PDF EXPEDICION
+=========================== */
+
+function descargarPDFExpedicion(){
+
+    const doc = new jsPDF();
+
+    doc.text('Reporte de Expedicion',10,10);
+
+    let y = 20;
+
+    expediciones.forEach(e => {
+
+        doc.text(
+        `${e.fecha} | ${e.camion} | ${e.mercaderia} | ${e.peso}kg`,
+        10,
+        y
+        );
+
+        y += 10;
+    });
+
+    doc.save('expedicion.pdf');
+}
+
+/* ===========================
+   PDF CONTABLE
+=========================== */
+
+function descargarPDFContable(){
+
+    const doc = new jsPDF();
+
+    doc.text('Reporte Contable',10,10);
+
+    let y = 20;
+
+    movimientos.forEach(m => {
+
+        doc.text(
+        `${m.fecha} | ${m.tipo} | $${m.monto} | ${m.pdf}`,
+        10,
+        y
+        );
+
+        y += 10;
+    });
+
+    doc.save('contable.pdf');
+}
+
+/* ===========================
+   BASE DE DATOS LOCAL PC
+=========================== */
+
+/*
+Actualmente el sistema usa localStorage.
+
+Para convertir la PC en servidor local:
+1. Instalar XAMPP
+2. Crear MySQL
+3. Usar PHP + MySQL
+4. Reemplazar localStorage por fetch()
+
+Esto permite:
+- múltiples PCs
+- backups reales
+- seguridad
+- usuarios
+- reportes
+- acceso desde red local
+
+*/
+
 renderExpediciones();
 renderStock();
 renderMovimientos();
@@ -516,4 +746,3 @@ renderMovimientos();
 
 </body>
 </html>
-```
