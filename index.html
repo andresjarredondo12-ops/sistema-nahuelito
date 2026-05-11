@@ -667,270 +667,7 @@ document.getElementById(
 ).value;
 
 const password =
-document.getElementById(
-'nuevoPassword'
-).value;
-
-const rol =
-document.getElementById(
-'nuevoRol'
-).value;
-
-if(!usuario || !password){
-
-alert('Complete datos');
-return;
-
-}
-
-usuarios.push({
-
-usuario,
-password,
-rol
-
-});
-
-guardarDatos();
-
-renderUsuarios();
-
-alert('Usuario creado');
-
-}
-
-function renderUsuarios(){
-
-const tabla =
-document.getElementById(
-'tablaUsuarios'
-);
-
-tabla.innerHTML='';
-
-usuarios.forEach((u,index)=>{
-
-tabla.innerHTML += `
-
-<tr>
-
-<td>${u.usuario}</td>
-
-<td>${u.rol}</td>
-
-<td>
-
-<button class="delete"
-onclick="eliminarUsuario(${index})">
-
-Eliminar
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-}
-
-function eliminarUsuario(index){
-
-if(confirm('Eliminar usuario?')){
-
-usuarios.splice(index,1);
-
-guardarDatos();
-
-renderUsuarios();
-
-}
-
-}
-
-/* ====================================
-   NAVEGACION
-==================================== */
-
-function showSection(id){
-
-document.querySelectorAll('.section')
-.forEach(sec => {
-
-sec.classList.remove('active');
-
-});
-
-document.getElementById(id)
-.classList.add('active');
-
-}
-
-/* ====================================
-   STOCK
-==================================== */
-
-function agregarStock(){
-
-const nombre =
-document.getElementById(
-'mercaderiaStock'
-).value;
-
-const peso =
-Number(
-document.getElementById(
-'pesoStock'
-).value
-);
-
-if(!nombre || !peso){
-
-alert('Complete datos');
-return;
-
-}
-
-const existente =
-stock.find(s =>
-s.nombre === nombre
-);
-
-if(existente){
-
-existente.peso += peso;
-
-}else{
-
-stock.push({
-
-nombre,
-peso
-
-});
-
-}
-
-guardarDatos();
-
-renderStock();
-
-}
-
-function renderStock(){
-
-const tabla =
-document.getElementById(
-'tablaStock'
-);
-
-tabla.innerHTML='';
-
-stock.forEach((s,index)=>{
-
-tabla.innerHTML += `
-
-<tr>
-
-<td>${s.nombre}</td>
-
-<td>${s.peso} kg</td>
-
-<td>
-
-<button class="delete"
-onclick="eliminarStock(${index})">
-
-Eliminar
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-}
-
-function eliminarStock(index){
-
-if(confirm('Eliminar stock?')){
-
-stock.splice(index,1);
-
-guardarDatos();
-
-renderStock();
-
-}
-
-}
-
-/* ====================================
-   EXPEDICION
-==================================== */
-
-function agregarExpedicion(){
-
-const camion =
-document.getElementById(
-'camion'
-).value;
-
-const mercaderia =
-document.getElementById(
-'mercaderiaExp'
-).value;
-
-const peso =
-Number(
-document.getElementById(
-'pesoExp'
-).value
-);
-
-const item =
-stock.find(s =>
-s.nombre === mercaderia
-);
-
-if(!item){
-
-alert('No existe stock');
-return;
-
-}
-
-if(item.peso < peso){
-
-alert('Stock insuficiente');
-return;
-
-}
-
-item.peso -= peso;
-
-expediciones.push({
-
-fecha:fechaHoraActual(),
-camion,
-mercaderia,
-peso,
-usuario:usuarioActivo.usuario
-
-});
-
-guardarDatos();
-
-renderExpediciones();
-renderStock();
-<!DOCTYPE html>
+document.getElementById(<!DOCTYPE html>
 <html lang="es">
 <head>
 
@@ -1183,8 +920,13 @@ table th{
 
 <h2>SGC Nahuelito</h2>
 
-<input type="text" id="loginUser" placeholder="Usuario">
-<input type="password" id="loginPass" placeholder="Contraseña">
+<input type="text"
+id="loginUser"
+placeholder="Usuario">
+
+<input type="password"
+id="loginPass"
+placeholder="Contraseña">
 
 <button onclick="login()">
 Ingresar
@@ -1232,7 +974,8 @@ Stock
 </button>
 
 <button id="btnAdmin"
-onclick="showSection('admin')">
+onclick="showSection('admin')"
+style="display:none;">
 Administración
 </button>
 
@@ -1479,10 +1222,9 @@ Descargar PDF
 
 const { jsPDF } = window.jspdf;
 
-/* ================= BASE DATOS LOCAL ================= */
+/* ================= USUARIOS ================= */
 
-let usuarios =
-JSON.parse(localStorage.getItem('usuarios')) || [
+let usuarios = [
 
 {
 usuario:'admin',
@@ -1491,6 +1233,8 @@ rol:'admin'
 }
 
 ];
+
+/* ================= DATOS ================= */
 
 let expediciones =
 JSON.parse(localStorage.getItem('expediciones')) || [];
@@ -1506,11 +1250,6 @@ let usuarioActivo = null;
 /* ================= GUARDAR ================= */
 
 function guardarDatos(){
-
-localStorage.setItem(
-'usuarios',
-JSON.stringify(usuarios)
-);
 
 localStorage.setItem(
 'expediciones',
@@ -1546,6 +1285,40 @@ document.getElementById('loginUser').value;
 
 const pass =
 document.getElementById('loginPass').value;
+
+/* LOGIN ADMIN */
+
+if(user === 'admin' && pass === '050526'){
+
+usuarioActivo = {
+
+usuario:'admin',
+rol:'admin'
+
+};
+
+document.getElementById(
+'loginScreen'
+).style.display='none';
+
+document.getElementById(
+'usuarioActivo'
+).innerText =
+'admin';
+
+document.getElementById(
+'btnAdmin'
+).style.display='inline-block';
+
+renderUsuarios();
+
+alert('Bienvenido Administrador');
+
+return;
+
+}
+
+/* LOGIN USUARIOS */
 
 const encontrado =
 usuarios.find(u =>
@@ -1585,6 +1358,13 @@ location.reload();
 
 function crearUsuario(){
 
+if(usuarioActivo.rol !== 'admin'){
+
+alert('Solo administrador');
+return;
+
+}
+
 const usuario =
 document.getElementById(
 'nuevoUsuario'
@@ -1614,8 +1394,6 @@ password,
 rol
 
 });
-
-guardarDatos();
 
 renderUsuarios();
 
@@ -1666,8 +1444,6 @@ function eliminarUsuario(index){
 if(confirm('Eliminar usuario?')){
 
 usuarios.splice(index,1);
-
-guardarDatos();
 
 renderUsuarios();
 
@@ -2135,7 +1911,6 @@ doc.save('contable.pdf');
 renderStock();
 renderExpediciones();
 renderMovimientos();
-renderUsuarios();
 
 </script>
 
