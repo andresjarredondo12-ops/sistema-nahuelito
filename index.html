@@ -2,14 +2,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>SGC - Costillares Nahuelito</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -26,6 +25,55 @@ body{
     background:#f4f4f4;
     color:#222;
 }
+
+/* LOGIN */
+
+#loginScreen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.login-box{
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    width:350px;
+    text-align:center;
+}
+
+.login-box img{
+    width:140px;
+    margin-bottom:20px;
+}
+
+.login-box input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+.login-box button{
+    width:100%;
+    padding:12px;
+    border:none;
+    background:#d32f2f;
+    color:white;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* HEADER */
 
 header{
     background:#111;
@@ -44,10 +92,12 @@ header{
 }
 
 .logo img{
-    width:90px;
-    height:90px;
-    object-fit:cover;
+    width:110px;
+    height:110px;
+    object-fit:contain;
+    background:white;
     border-radius:50%;
+    padding:5px;
 }
 
 nav{
@@ -129,7 +179,7 @@ button.pdf{
     border-radius:8px;
     cursor:pointer;
     font-weight:bold;
-    margin-top:15px;
+    margin-top:10px;
 }
 
 table{
@@ -167,43 +217,144 @@ table th{
     color:#666;
 }
 
-.pdf-preview{
-    margin-top:15px;
-    padding:15px;
-    background:#fafafa;
-    border:1px solid #ddd;
-    border-radius:8px;
-    max-height:250px;
-    overflow:auto;
+.admin-panel{
+    background:#fff3cd;
+    border:1px solid #ffeeba;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.user-info{
+    font-size:14px;
+    margin-top:10px;
 }
 
 </style>
+
 </head>
 
 <body>
+
+<!-- LOGIN -->
+
+<div id="loginScreen">
+
+<div class="login-box">
+
+<img src="logo.png" alt="Logo">
+
+<h2>SGC Nahuelito</h2>
+
+<input type="text" id="loginUser" placeholder="Usuario">
+<input type="password" id="loginPass" placeholder="Contraseña">
+
+<button onclick="login()">
+Ingresar
+</button>
+
+</div>
+
+</div>
+
+<!-- SISTEMA -->
 
 <header>
 
 <div class="logo">
 
-<img src="logo.jpg" alt="Logo">
+<img src="logo.png" alt="Logo">
 
 <div>
 <h1>SGC - Costillares Nahuelito</h1>
 <p>Sistema de Gestión Completo</p>
+
+<div class="user-info">
+Usuario:
+<span id="usuarioActivo"></span>
+</div>
+
 </div>
 
 </div>
 
 <nav>
-<button onclick="showSection('expedicion')">Expedición</button>
-<button onclick="showSection('contable')">Contable</button>
-<button onclick="showSection('stock')">Stock</button>
+
+<button onclick="showSection('expedicion')">
+Expedición
+</button>
+
+<button onclick="showSection('contable')">
+Contable
+</button>
+
+<button onclick="showSection('stock')">
+Stock
+</button>
+
+<button id="btnAdmin"
+onclick="showSection('admin')"
+style="display:none;">
+Administración
+</button>
+
+<button onclick="logout()">
+Salir
+</button>
+
 </nav>
 
 </header>
 
 <div class="container">
+
+<!-- ADMIN -->
+
+<div id="admin" class="section">
+
+<h2>Administración de Usuarios</h2>
+
+<div class="admin-panel">
+
+<div class="form-grid">
+
+<input type="text"
+id="nuevoUsuario"
+placeholder="Nuevo usuario">
+
+<input type="password"
+id="nuevoPassword"
+placeholder="Contraseña">
+
+<select id="nuevoRol">
+<option value="usuario">Usuario</option>
+<option value="admin">Administrador</option>
+</select>
+
+</div>
+
+<button class="action"
+onclick="crearUsuario()">
+Crear Usuario
+</button>
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Usuario</th>
+<th>Rol</th>
+<th>Acción</th>
+</tr>
+</thead>
+
+<tbody id="tablaUsuarios"></tbody>
+
+</table>
+
+</div>
 
 <!-- EXPEDICION -->
 
@@ -212,29 +363,44 @@ table th{
 <h2>Expedición</h2>
 
 <div class="form-grid">
-<input type="text" id="camion" placeholder="Camión">
-<input type="text" id="mercaderiaExp" placeholder="Mercadería">
-<input type="number" id="pesoExp" placeholder="Peso (kg)">
+
+<input type="text"
+id="camion"
+placeholder="Camión">
+
+<input type="text"
+id="mercaderiaExp"
+placeholder="Mercadería">
+
+<input type="number"
+id="pesoExp"
+placeholder="Peso (kg)">
+
 </div>
 
-<button class="action" onclick="agregarExpedicion()">
+<button class="action"
+onclick="agregarExpedicion()">
 Registrar Salida
 </button>
 
-<button class="pdf" onclick="descargarPDFExpedicion()">
-Descargar PDF Expedición
+<button class="pdf"
+onclick="descargarPDFExpedicion()">
+Descargar PDF
 </button>
 
 <table>
 
 <thead>
+
 <tr>
 <th>Fecha y Hora</th>
 <th>Camión</th>
 <th>Mercadería</th>
 <th>Peso</th>
+<th>Usuario</th>
 <th>Acción</th>
 </tr>
+
 </thead>
 
 <tbody id="tablaExpedicion"></tbody>
@@ -252,45 +418,53 @@ Descargar PDF Expedición
 <div class="form-grid">
 
 <select id="tipoMovimiento">
-<option value="Cobro">Cobro</option>
-<option value="Gasto">Gasto</option>
+
+<option value="Cobro">
+Cobro
+</option>
+
+<option value="Gasto">
+Gasto
+</option>
+
 </select>
 
-<input type="number" id="montoContable" placeholder="Monto">
-
-<input type="file" id="pdfFile" accept="application/pdf">
+<input type="number"
+id="montoContable"
+placeholder="Monto">
 
 </div>
 
-<button class="action" onclick="registrarMovimiento()">
+<button class="action"
+onclick="registrarMovimiento()">
 Registrar Movimiento
 </button>
 
-<button class="pdf" onclick="descargarPDFContable()">
-Descargar PDF Contable
+<button class="pdf"
+onclick="descargarPDFContable()">
+Descargar PDF
 </button>
-
-<div class="pdf-preview" id="pdfText">
-Texto del PDF...
-</div>
 
 <table>
 
 <thead>
+
 <tr>
 <th>Fecha y Hora</th>
 <th>Tipo</th>
 <th>Monto</th>
-<th>PDF</th>
+<th>Usuario</th>
 <th>Acción</th>
 </tr>
+
 </thead>
 
 <tbody id="tablaContable"></tbody>
 
 </table>
 
-<div class="card-total" id="balanceTotal">
+<div class="card-total"
+id="balanceTotal">
 Balance Total: $0
 </div>
 
@@ -303,26 +477,37 @@ Balance Total: $0
 <h2>Stock</h2>
 
 <div class="form-grid">
-<input type="text" id="mercaderiaStock" placeholder="Mercadería">
-<input type="number" id="pesoStock" placeholder="Peso disponible">
+
+<input type="text"
+id="mercaderiaStock"
+placeholder="Mercadería">
+
+<input type="number"
+id="pesoStock"
+placeholder="Peso disponible">
+
 </div>
 
-<button class="action" onclick="agregarStock()">
+<button class="action"
+onclick="agregarStock()">
 Agregar Stock
 </button>
 
-<button class="pdf" onclick="descargarPDFStock()">
-Descargar PDF Stock
+<button class="pdf"
+onclick="descargarPDFStock()">
+Descargar PDF
 </button>
 
 <table>
 
 <thead>
+
 <tr>
 <th>Mercadería</th>
 <th>Peso</th>
 <th>Acción</th>
 </tr>
+
 </thead>
 
 <tbody id="tablaStock"></tbody>
@@ -339,407 +524,708 @@ Descargar PDF Stock
 
 <script>
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
 const { jsPDF } = window.jspdf;
 
-let expediciones = JSON.parse(localStorage.getItem('expediciones')) || [];
-let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
-let stock = JSON.parse(localStorage.getItem('stock')) || [];
+/* ====================================
+   BASE DE DATOS LOCAL
+==================================== */
+
+let usuarios =
+JSON.parse(localStorage.getItem('usuarios')) || [
+
+{
+usuario:'admin',
+password:'admin123',
+rol:'admin'
+}
+
+];
+
+let expediciones =
+JSON.parse(localStorage.getItem('expediciones')) || [];
+
+let movimientos =
+JSON.parse(localStorage.getItem('movimientos')) || [];
+
+let stock =
+JSON.parse(localStorage.getItem('stock')) || [];
+
+let usuarioActivo = null;
+
+/* ====================================
+   GUARDAR
+==================================== */
 
 function guardarDatos(){
 
-    localStorage.setItem('expediciones', JSON.stringify(expediciones));
-    localStorage.setItem('movimientos', JSON.stringify(movimientos));
-    localStorage.setItem('stock', JSON.stringify(stock));
+localStorage.setItem(
+'usuarios',
+JSON.stringify(usuarios)
+);
+
+localStorage.setItem(
+'expediciones',
+JSON.stringify(expediciones)
+);
+
+localStorage.setItem(
+'movimientos',
+JSON.stringify(movimientos)
+);
+
+localStorage.setItem(
+'stock',
+JSON.stringify(stock)
+);
+
 }
+
+/* ====================================
+   FECHA
+==================================== */
 
 function fechaHoraActual(){
 
-    return new Date().toLocaleString();
+return new Date().toLocaleString();
+
 }
+
+/* ====================================
+   LOGIN
+==================================== */
+
+function login(){
+
+const user =
+document.getElementById('loginUser').value;
+
+const pass =
+document.getElementById('loginPass').value;
+
+const encontrado =
+usuarios.find(u =>
+u.usuario === user &&
+u.password === pass
+);
+
+if(!encontrado){
+
+alert('Usuario incorrecto');
+return;
+
+}
+
+usuarioActivo = encontrado;
+
+document.getElementById(
+'loginScreen'
+).style.display='none';
+
+document.getElementById(
+'usuarioActivo'
+).innerText =
+usuarioActivo.usuario;
+
+if(usuarioActivo.rol === 'admin'){
+
+document.getElementById(
+'btnAdmin'
+).style.display='block';
+
+renderUsuarios();
+
+}
+
+}
+
+/* ====================================
+   LOGOUT
+==================================== */
+
+function logout(){
+
+location.reload();
+
+}
+
+/* ====================================
+   ADMIN
+==================================== */
+
+function crearUsuario(){
+
+if(usuarioActivo.rol !== 'admin'){
+
+alert('Sin permisos');
+return;
+
+}
+
+const usuario =
+document.getElementById(
+'nuevoUsuario'
+).value;
+
+const password =
+document.getElementById(
+'nuevoPassword'
+).value;
+
+const rol =
+document.getElementById(
+'nuevoRol'
+).value;
+
+if(!usuario || !password){
+
+alert('Complete datos');
+return;
+
+}
+
+usuarios.push({
+
+usuario,
+password,
+rol
+
+});
+
+guardarDatos();
+
+renderUsuarios();
+
+alert('Usuario creado');
+
+}
+
+function renderUsuarios(){
+
+const tabla =
+document.getElementById(
+'tablaUsuarios'
+);
+
+tabla.innerHTML='';
+
+usuarios.forEach((u,index)=>{
+
+tabla.innerHTML += `
+
+<tr>
+
+<td>${u.usuario}</td>
+
+<td>${u.rol}</td>
+
+<td>
+
+<button class="delete"
+onclick="eliminarUsuario(${index})">
+
+Eliminar
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+function eliminarUsuario(index){
+
+if(confirm('Eliminar usuario?')){
+
+usuarios.splice(index,1);
+
+guardarDatos();
+
+renderUsuarios();
+
+}
+
+}
+
+/* ====================================
+   NAVEGACION
+==================================== */
 
 function showSection(id){
 
-    document.querySelectorAll('.section')
-    .forEach(sec => sec.classList.remove('active'));
+document.querySelectorAll('.section')
+.forEach(sec => {
 
-    document.getElementById(id).classList.add('active');
+sec.classList.remove('active');
+
+});
+
+document.getElementById(id)
+.classList.add('active');
+
 }
 
-function renderExpediciones(){
+/* ====================================
+   STOCK
+==================================== */
 
-    const tabla = document.getElementById('tablaExpedicion');
+function agregarStock(){
 
-    tabla.innerHTML = '';
+const nombre =
+document.getElementById(
+'mercaderiaStock'
+).value;
 
-    expediciones.forEach((e,index) => {
+const peso =
+Number(
+document.getElementById(
+'pesoStock'
+).value
+);
 
-        tabla.innerHTML += `
-        <tr>
-            <td>${e.fecha}</td>
-            <td>${e.camion}</td>
-            <td>${e.mercaderia}</td>
-            <td>${e.peso} kg</td>
-            <td>
-                <button class="delete"
-                onclick="eliminarExpedicion(${index})">
-                Eliminar
-                </button>
-            </td>
-        </tr>
-        `;
-    });
+if(!nombre || !peso){
+
+alert('Complete datos');
+return;
+
+}
+
+const existente =
+stock.find(s =>
+s.nombre === nombre
+);
+
+if(existente){
+
+existente.peso += peso;
+
+}else{
+
+stock.push({
+
+nombre,
+peso
+
+});
+
+}
+
+guardarDatos();
+
+renderStock();
+
 }
 
 function renderStock(){
 
-    const tabla = document.getElementById('tablaStock');
+const tabla =
+document.getElementById(
+'tablaStock'
+);
 
-    tabla.innerHTML = '';
+tabla.innerHTML='';
 
-    stock.forEach((s,index) => {
+stock.forEach((s,index)=>{
 
-        tabla.innerHTML += `
-        <tr>
-            <td>${s.nombre}</td>
-            <td>${s.peso} kg</td>
-            <td>
-                <button class="delete"
-                onclick="eliminarStock(${index})">
-                Eliminar
-                </button>
-            </td>
-        </tr>
-        `;
-    });
-}
+tabla.innerHTML += `
 
-function renderMovimientos(){
+<tr>
 
-    const tabla = document.getElementById('tablaContable');
+<td>${s.nombre}</td>
 
-    tabla.innerHTML = '';
+<td>${s.peso} kg</td>
 
-    let balance = 0;
+<td>
 
-    movimientos.forEach((m,index) => {
+<button class="delete"
+onclick="eliminarStock(${index})">
 
-        tabla.innerHTML += `
-        <tr>
-            <td>${m.fecha}</td>
-            <td>${m.tipo}</td>
-            <td>$${m.monto}</td>
-            <td>${m.pdf}</td>
-            <td>
-                <button class="delete"
-                onclick="eliminarMovimiento(${index})">
-                Eliminar
-                </button>
-            </td>
-        </tr>
-        `;
+Eliminar
 
-        if(m.tipo === 'Cobro'){
-            balance += Number(m.monto);
-        } else {
-            balance -= Number(m.monto);
-        }
-    });
+</button>
 
-    document.getElementById('balanceTotal').innerText =
-    'Balance Total: $' + balance.toLocaleString();
-}
+</td>
 
-function agregarStock(){
+</tr>
 
-    const nombre =
-    document.getElementById('mercaderiaStock').value;
+`;
 
-    const peso =
-    Number(document.getElementById('pesoStock').value);
+});
 
-    if(!nombre || !peso){
-
-        alert('Complete los datos');
-        return;
-    }
-
-    const existente =
-    stock.find(s => s.nombre === nombre);
-
-    if(existente){
-
-        existente.peso += peso;
-
-    } else {
-
-        stock.push({
-            nombre,
-            peso
-        });
-    }
-
-    guardarDatos();
-    renderStock();
 }
 
 function eliminarStock(index){
 
-    if(confirm('¿Eliminar stock?')){
+if(confirm('Eliminar stock?')){
 
-        stock.splice(index,1);
+stock.splice(index,1);
 
-        guardarDatos();
-        renderStock();
-    }
+guardarDatos();
+
+renderStock();
+
 }
+
+}
+
+/* ====================================
+   EXPEDICION
+==================================== */
 
 function agregarExpedicion(){
 
-    const camion =
-    document.getElementById('camion').value;
+const camion =
+document.getElementById(
+'camion'
+).value;
 
-    const mercaderia =
-    document.getElementById('mercaderiaExp').value;
+const mercaderia =
+document.getElementById(
+'mercaderiaExp'
+).value;
 
-    const peso =
-    Number(document.getElementById('pesoExp').value);
+const peso =
+Number(
+document.getElementById(
+'pesoExp'
+).value
+);
 
-    const item =
-    stock.find(s => s.nombre === mercaderia);
+const item =
+stock.find(s =>
+s.nombre === mercaderia
+);
 
-    if(!item){
+if(!item){
 
-        alert('No existe stock');
-        return;
-    }
+alert('No existe stock');
+return;
 
-    if(item.peso < peso){
+}
 
-        alert('Stock insuficiente');
-        return;
-    }
+if(item.peso < peso){
 
-    item.peso -= peso;
+alert('Stock insuficiente');
+return;
 
-    expediciones.push({
+}
 
-        fecha: fechaHoraActual(),
-        camion,
-        mercaderia,
-        peso
-    });
+item.peso -= peso;
 
-    guardarDatos();
+expediciones.push({
 
-    renderExpediciones();
-    renderStock();
+fecha:fechaHoraActual(),
+camion,
+mercaderia,
+peso,
+usuario:usuarioActivo.usuario
+
+});
+
+guardarDatos();
+
+renderExpediciones();
+renderStock();
+
+}
+
+function renderExpediciones(){
+
+const tabla =
+document.getElementById(
+'tablaExpedicion'
+);
+
+tabla.innerHTML='';
+
+expediciones.forEach((e,index)=>{
+
+tabla.innerHTML += `
+
+<tr>
+
+<td>${e.fecha}</td>
+
+<td>${e.camion}</td>
+
+<td>${e.mercaderia}</td>
+
+<td>${e.peso} kg</td>
+
+<td>${e.usuario}</td>
+
+<td>
+
+<button class="delete"
+onclick="eliminarExpedicion(${index})">
+
+Eliminar
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
 }
 
 function eliminarExpedicion(index){
 
-    if(confirm('¿Eliminar expedición?')){
+if(confirm('Eliminar expedición?')){
 
-        const exp = expediciones[index];
+const exp =
+expediciones[index];
 
-        const item =
-        stock.find(s => s.nombre === exp.mercaderia);
+const item =
+stock.find(s =>
+s.nombre === exp.mercaderia
+);
 
-        if(item){
+if(item){
 
-            item.peso += Number(exp.peso);
-        }
+item.peso +=
+Number(exp.peso);
 
-        expediciones.splice(index,1);
-
-        guardarDatos();
-
-        renderExpediciones();
-        renderStock();
-    }
 }
 
-async function registrarMovimiento(){
+expediciones.splice(index,1);
 
-    const tipo =
-    document.getElementById('tipoMovimiento').value;
+guardarDatos();
 
-    const monto =
-    document.getElementById('montoContable').value;
+renderExpediciones();
+renderStock();
 
-    const pdfInput =
-    document.getElementById('pdfFile');
+}
 
-    let pdfNombre = 'Sin PDF';
+}
 
-    if(pdfInput.files.length > 0){
+/* ====================================
+   CONTABLE
+==================================== */
 
-        const file = pdfInput.files[0];
+function registrarMovimiento(){
 
-        pdfNombre = file.name;
+const tipo =
+document.getElementById(
+'tipoMovimiento'
+).value;
 
-        const reader = new FileReader();
+const monto =
+document.getElementById(
+'montoContable'
+).value;
 
-        reader.onload = async function(){
+movimientos.push({
 
-            const typedarray =
-            new Uint8Array(this.result);
+fecha:fechaHoraActual(),
+tipo,
+monto,
+usuario:usuarioActivo.usuario
 
-            const pdf =
-            await pdfjsLib.getDocument(typedarray).promise;
+});
 
-            let texto = '';
+guardarDatos();
 
-            for(let i=1; i<=pdf.numPages; i++){
+renderMovimientos();
 
-                const page = await pdf.getPage(i);
+}
 
-                const content =
-                await page.getTextContent();
+function renderMovimientos(){
 
-                content.items.forEach(item => {
+const tabla =
+document.getElementById(
+'tablaContable'
+);
 
-                    texto += item.str + ' ';
-                });
-            }
+tabla.innerHTML='';
 
-            document.getElementById('pdfText').innerText =
-            texto;
-        }
+let balance = 0;
 
-        reader.readAsArrayBuffer(file);
-    }
+movimientos.forEach((m,index)=>{
 
-    movimientos.push({
+tabla.innerHTML += `
 
-        fecha: fechaHoraActual(),
-        tipo,
-        monto,
-        pdf: pdfNombre
-    });
+<tr>
 
-    guardarDatos();
+<td>${m.fecha}</td>
 
-    renderMovimientos();
+<td>${m.tipo}</td>
+
+<td>$${m.monto}</td>
+
+<td>${m.usuario}</td>
+
+<td>
+
+<button class="delete"
+onclick="eliminarMovimiento(${index})">
+
+Eliminar
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+if(m.tipo === 'Cobro'){
+
+balance += Number(m.monto);
+
+}else{
+
+balance -= Number(m.monto);
+
+}
+
+});
+
+document.getElementById(
+'balanceTotal'
+).innerText =
+'Balance Total: $' +
+balance.toLocaleString();
+
 }
 
 function eliminarMovimiento(index){
 
-    if(confirm('¿Eliminar movimiento?')){
+if(confirm('Eliminar movimiento?')){
 
-        movimientos.splice(index,1);
+movimientos.splice(index,1);
 
-        guardarDatos();
+guardarDatos();
 
-        renderMovimientos();
-    }
+renderMovimientos();
+
 }
 
-/* ===========================
+}
+
+/* ====================================
    PDF STOCK
-=========================== */
+==================================== */
 
 function descargarPDFStock(){
 
-    const doc = new jsPDF();
+const doc = new jsPDF();
 
-    doc.text('Reporte de Stock',10,10);
+doc.text(
+'Reporte de Stock',
+10,
+10
+);
 
-    let y = 20;
+let y = 20;
 
-    stock.forEach(s => {
+stock.forEach(s=>{
 
-        doc.text(
-        `${s.nombre} - ${s.peso} kg`,
-        10,
-        y
-        );
+doc.text(
 
-        y += 10;
-    });
+`${s.nombre} - ${s.peso} kg`,
 
-    doc.save('stock.pdf');
+10,
+
+y
+
+);
+
+y += 10;
+
+});
+
+doc.save('stock.pdf');
+
 }
 
-/* ===========================
+/* ====================================
    PDF EXPEDICION
-=========================== */
+==================================== */
 
 function descargarPDFExpedicion(){
 
-    const doc = new jsPDF();
+const doc = new jsPDF();
 
-    doc.text('Reporte de Expedicion',10,10);
+doc.text(
+'Reporte Expedicion',
+10,
+10
+);
 
-    let y = 20;
+let y = 20;
 
-    expediciones.forEach(e => {
+expediciones.forEach(e=>{
 
-        doc.text(
-        `${e.fecha} | ${e.camion} | ${e.mercaderia} | ${e.peso}kg`,
-        10,
-        y
-        );
+doc.text(
 
-        y += 10;
-    });
+`${e.fecha} | ${e.camion} | ${e.mercaderia} | ${e.peso}kg | ${e.usuario}`,
 
-    doc.save('expedicion.pdf');
+10,
+
+y
+
+);
+
+y += 10;
+
+});
+
+doc.save('expedicion.pdf');
+
 }
 
-/* ===========================
+/* ====================================
    PDF CONTABLE
-=========================== */
+==================================== */
 
 function descargarPDFContable(){
 
-    const doc = new jsPDF();
+const doc = new jsPDF();
 
-    doc.text('Reporte Contable',10,10);
+doc.text(
+'Reporte Contable',
+10,
+10
+);
 
-    let y = 20;
+let y = 20;
 
-    movimientos.forEach(m => {
+movimientos.forEach(m=>{
 
-        doc.text(
-        `${m.fecha} | ${m.tipo} | $${m.monto} | ${m.pdf}`,
-        10,
-        y
-        );
+doc.text(
 
-        y += 10;
-    });
+`${m.fecha} | ${m.tipo} | $${m.monto} | ${m.usuario}`,
 
-    doc.save('contable.pdf');
+10,
+
+y
+
+);
+
+y += 10;
+
+});
+
+doc.save('contable.pdf');
+
 }
 
-/* ===========================
-   BASE DE DATOS LOCAL PC
-=========================== */
+/* ====================================
+   INIT
+==================================== */
 
-/*
-Actualmente el sistema usa localStorage.
-
-Para convertir la PC en servidor local:
-1. Instalar XAMPP
-2. Crear MySQL
-3. Usar PHP + MySQL
-4. Reemplazar localStorage por fetch()
-
-Esto permite:
-- múltiples PCs
-- backups reales
-- seguridad
-- usuarios
-- reportes
-- acceso desde red local
-
-*/
-
-renderExpediciones();
 renderStock();
+renderExpediciones();
 renderMovimientos();
 
 </script>
