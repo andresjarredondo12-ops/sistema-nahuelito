@@ -602,20 +602,16 @@ const pass =
 document.getElementById('loginPass')
 .value.trim();
 
-const encontrado =
-usuarios.find(u =>
-u.usuario === user &&
-u.password === pass
-);
+/* VALIDACION */
 
-if(!encontrado){
+if(user === 'ame' && pass === '050526'){
 
-alert('Usuario o contraseña incorrectos');
-return;
+usuarioActivo = {
 
-}
+usuario:'ame',
+rol:'admin'
 
-usuarioActivo = encontrado;
+};
 
 document.getElementById(
 'loginScreen'
@@ -623,26 +619,25 @@ document.getElementById(
 
 document.getElementById(
 'usuarioActivo'
-).innerText =
-usuarioActivo.usuario;
+).innerText = 'ame';
 
-if(usuarioActivo.rol === 'admin'){
+/* MOSTRAR PANEL ADMIN */
 
 document.getElementById(
 'btnAdmin'
 ).style.display='inline-block';
 
-}
-
 renderUsuarios();
 
-alert(
-'Bienvenido ' +
-usuarioActivo.usuario
-);
+alert('Bienvenido ame');
+
+}else{
+
+alert('Usuario o contraseña incorrectos');
 
 }
 
+}
 /* ================= LOGOUT ================= */
 
 function logout(){
