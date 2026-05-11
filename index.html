@@ -1,0 +1,519 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SGC - Costillares Nahuelito</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    color:#222;
+}
+
+header{
+    background:#111;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+    border-radius:50%;
+}
+
+nav{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+nav button{
+    background:#d32f2f;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.container{
+    padding:20px;
+}
+
+.section{
+    display:none;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.active{
+    display:block;
+}
+
+h2{
+    margin-bottom:20px;
+    color:#d32f2f;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+input,select{
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    width:100%;
+}
+
+button.action{
+    background:#111;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th,
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+table th{
+    background:#111;
+    color:white;
+}
+
+.card-total{
+    margin-top:20px;
+    background:#d32f2f;
+    color:white;
+    padding:20px;
+    border-radius:12px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.footer{
+    margin-top:40px;
+    text-align:center;
+    padding:20px;
+    color:#666;
+}
+
+.pdf-preview{
+    margin-top:15px;
+    padding:15px;
+    background:#fafafa;
+    border:1px solid #ddd;
+    border-radius:8px;
+    max-height:250px;
+    overflow:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+    <img src="logo.jpg" alt="Logo">
+
+    <div>
+        <h1>SGC - Costillares Nahuelito</h1>
+        <p>Sistema de Gestión Completo</p>
+    </div>
+</div>
+
+<nav>
+    <button onclick="showSection('expedicion')">Expedición</button>
+    <button onclick="showSection('contable')">Contable</button>
+    <button onclick="showSection('stock')">Stock</button>
+</nav>
+
+</header>
+
+<div class="container">
+
+<div id="expedicion" class="section active">
+
+<h2>Expedición</h2>
+
+<div class="form-grid">
+    <input type="date" id="fechaExp">
+    <input type="text" id="camion" placeholder="Camión">
+    <input type="text" id="mercaderiaExp" placeholder="Mercadería">
+    <input type="number" id="pesoExp" placeholder="Peso (kg)">
+</div>
+
+<button class="action" onclick="agregarExpedicion()">
+Registrar Salida
+</button>
+
+<table>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Camión</th>
+<th>Mercadería</th>
+<th>Peso</th>
+</tr>
+</thead>
+
+<tbody id="tablaExpedicion"></tbody>
+</table>
+
+</div>
+
+<div id="contable" class="section">
+
+<h2>Contable</h2>
+
+<div class="form-grid">
+    <input type="date" id="fechaContable">
+
+    <select id="tipoMovimiento">
+        <option value="Cobro">Cobro</option>
+        <option value="Gasto">Gasto</option>
+    </select>
+
+    <input type="number" id="montoContable" placeholder="Monto">
+
+    <input type="file" id="pdfFile" accept="application/pdf">
+</div>
+
+<button class="action" onclick="registrarMovimiento()">
+Registrar Movimiento
+</button>
+
+<div class="pdf-preview" id="pdfText">
+Texto del PDF...
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Tipo</th>
+<th>Monto</th>
+<th>PDF</th>
+</tr>
+</thead>
+
+<tbody id="tablaContable"></tbody>
+
+</table>
+
+<div class="card-total" id="balanceTotal">
+Balance Total: $0
+</div>
+
+</div>
+
+<div id="stock" class="section">
+
+<h2>Stock</h2>
+
+<div class="form-grid">
+    <input type="text" id="mercaderiaStock" placeholder="Mercadería">
+    <input type="number" id="pesoStock" placeholder="Peso disponible">
+</div>
+
+<button class="action" onclick="agregarStock()">
+Agregar Stock
+</button>
+
+<table>
+<thead>
+<tr>
+<th>Mercadería</th>
+<th>Peso</th>
+</tr>
+</thead>
+
+<tbody id="tablaStock"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 Costillares Nahuelito
+</div>
+
+<script>
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+let expediciones = JSON.parse(localStorage.getItem('expediciones')) || [];
+let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
+let stock = JSON.parse(localStorage.getItem('stock')) || [];
+
+function guardarDatos(){
+    localStorage.setItem('expediciones', JSON.stringify(expediciones));
+    localStorage.setItem('movimientos', JSON.stringify(movimientos));
+    localStorage.setItem('stock', JSON.stringify(stock));
+}
+
+function showSection(id){
+    document.querySelectorAll('.section')
+    .forEach(sec => sec.classList.remove('active'));
+
+    document.getElementById(id).classList.add('active');
+}
+
+function renderExpediciones(){
+
+    const tabla = document.getElementById('tablaExpedicion');
+
+    tabla.innerHTML = '';
+
+    expediciones.forEach(e => {
+
+        tabla.innerHTML += `
+        <tr>
+            <td>${e.fecha}</td>
+            <td>${e.camion}</td>
+            <td>${e.mercaderia}</td>
+            <td>${e.peso} kg</td>
+        </tr>
+        `;
+    });
+}
+
+function renderStock(){
+
+    const tabla = document.getElementById('tablaStock');
+
+    tabla.innerHTML = '';
+
+    stock.forEach(s => {
+
+        tabla.innerHTML += `
+        <tr>
+            <td>${s.nombre}</td>
+            <td>${s.peso} kg</td>
+        </tr>
+        `;
+    });
+}
+
+function renderMovimientos(){
+
+    const tabla = document.getElementById('tablaContable');
+
+    tabla.innerHTML = '';
+
+    let balance = 0;
+
+    movimientos.forEach(m => {
+
+        tabla.innerHTML += `
+        <tr>
+            <td>${m.fecha}</td>
+            <td>${m.tipo}</td>
+            <td>$${m.monto}</td>
+            <td>${m.pdf}</td>
+        </tr>
+        `;
+
+        if(m.tipo === 'Cobro'){
+            balance += Number(m.monto);
+        } else {
+            balance -= Number(m.monto);
+        }
+    });
+
+    document.getElementById('balanceTotal').innerText =
+    'Balance Total: $' + balance.toLocaleString();
+}
+
+function agregarStock(){
+
+    const nombre =
+    document.getElementById('mercaderiaStock').value;
+
+    const peso =
+    Number(document.getElementById('pesoStock').value);
+
+    if(!nombre || !peso){
+        alert('Complete los datos');
+        return;
+    }
+
+    const existente = stock.find(s => s.nombre === nombre);
+
+    if(existente){
+        existente.peso += peso;
+    } else {
+        stock.push({nombre,peso});
+    }
+
+    guardarDatos();
+    renderStock();
+}
+
+function agregarExpedicion(){
+
+    const fecha =
+    document.getElementById('fechaExp').value;
+
+    const camion =
+    document.getElementById('camion').value;
+
+    const mercaderia =
+    document.getElementById('mercaderiaExp').value;
+
+    const peso =
+    Number(document.getElementById('pesoExp').value);
+
+    const item = stock.find(s => s.nombre === mercaderia);
+
+    if(!item){
+        alert('No existe stock');
+        return;
+    }
+
+    if(item.peso < peso){
+        alert('Stock insuficiente');
+        return;
+    }
+
+    item.peso -= peso;
+
+    expediciones.push({
+        fecha,
+        camion,
+        mercaderia,
+        peso
+    });
+
+    guardarDatos();
+
+    renderExpediciones();
+    renderStock();
+}
+
+async function registrarMovimiento(){
+
+    const fecha =
+    document.getElementById('fechaContable').value;
+
+    const tipo =
+    document.getElementById('tipoMovimiento').value;
+
+    const monto =
+    document.getElementById('montoContable').value;
+
+    const pdfInput =
+    document.getElementById('pdfFile');
+
+    let pdfNombre = 'Sin PDF';
+
+    if(pdfInput.files.length > 0){
+
+        const file = pdfInput.files[0];
+
+        pdfNombre = file.name;
+
+        const reader = new FileReader();
+
+        reader.onload = async function(){
+
+            const typedarray =
+            new Uint8Array(this.result);
+
+            const pdf =
+            await pdfjsLib.getDocument(typedarray).promise;
+
+            let texto = '';
+
+            for(let i=1; i<=pdf.numPages; i++){
+
+                const page = await pdf.getPage(i);
+
+                const content =
+                await page.getTextContent();
+
+                content.items.forEach(item => {
+                    texto += item.str + ' ';
+                });
+            }
+
+            document.getElementById('pdfText').innerText =
+            texto;
+        }
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    movimientos.push({
+        fecha,
+        tipo,
+        monto,
+        pdf: pdfNombre
+    });
+
+    guardarDatos();
+
+    renderMovimientos();
+}
+
+renderExpediciones();
+renderStock();
+renderMovimientos();
+
+</script>
+
+</body>
+</html>
+```
