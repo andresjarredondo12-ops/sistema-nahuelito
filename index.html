@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1318,7 +1317,613 @@ return;
 
 }
 
-/* LOGIN USUARIOS */
+/* LOGIN USUARIOS */<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SGC - Costillares Nahuelito</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    color:#222;
+}
+
+/* LOGIN */
+
+#loginScreen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.login-box{
+    background:white;
+    padding:40px;
+    border-radius:15px;
+    width:350px;
+    text-align:center;
+}
+
+.login-box img{
+    width:130px;
+    margin-bottom:20px;
+}
+
+.login-box input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+.login-box button{
+    width:100%;
+    padding:12px;
+    background:#d32f2f;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* HEADER */
+
+header{
+    background:#111;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo img{
+    width:100px;
+    height:100px;
+    object-fit:contain;
+    background:white;
+    border-radius:50%;
+    padding:5px;
+}
+
+nav{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+nav button{
+    background:#d32f2f;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.container{
+    padding:20px;
+}
+
+.section{
+    display:none;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.active{
+    display:block;
+}
+
+h2{
+    margin-bottom:20px;
+    color:#d32f2f;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+input,select{
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    width:100%;
+}
+
+button.action{
+    background:#111;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button.delete{
+    background:#c62828;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button.pdf{
+    background:#1976d2;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th,
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+table th{
+    background:#111;
+    color:white;
+}
+
+.card-total{
+    margin-top:20px;
+    background:#d32f2f;
+    color:white;
+    padding:20px;
+    border-radius:12px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.footer{
+    text-align:center;
+    padding:20px;
+    color:#666;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginScreen">
+
+<div class="login-box">
+
+<img src="logo.png" alt="Logo">
+
+<h2>SGC Nahuelito</h2>
+
+<input type="text" id="loginUser" placeholder="Usuario">
+
+<input type="password" id="loginPass" placeholder="Contraseña">
+
+<button onclick="login()">
+Ingresar
+</button>
+
+</div>
+
+</div>
+
+<!-- SISTEMA -->
+
+<header>
+
+<div class="logo">
+
+<img src="logo.png" alt="Logo">
+
+<div>
+<h1>SGC - Costillares Nahuelito</h1>
+<p>Sistema de Gestión Completo</p>
+
+<p>
+Usuario:
+<b id="usuarioActivo"></b>
+</p>
+
+</div>
+
+</div>
+
+<nav>
+
+<button onclick="showSection('expedicion')">
+Expedición
+</button>
+
+<button onclick="showSection('contable')">
+Contable
+</button>
+
+<button onclick="showSection('stock')">
+Stock
+</button>
+
+<button id="btnAdmin"
+style="display:none;"
+onclick="showSection('admin')">
+Administración
+</button>
+
+<button onclick="logout()">
+Salir
+</button>
+
+</nav>
+
+</header>
+
+<div class="container">
+
+<!-- ADMIN -->
+
+<div id="admin" class="section">
+
+<h2>Administración de Usuarios</h2>
+
+<div class="form-grid">
+
+<input type="text"
+id="nuevoUsuario"
+placeholder="Usuario">
+
+<input type="password"
+id="nuevoPassword"
+placeholder="Contraseña">
+
+<select id="nuevoRol">
+
+<option value="usuario">
+Usuario
+</option>
+
+<option value="admin">
+Administrador
+</option>
+
+</select>
+
+</div>
+
+<button class="action"
+onclick="crearUsuario()">
+Crear Usuario
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Usuario</th>
+<th>Rol</th>
+<th>Acción</th>
+</tr>
+
+</thead>
+
+<tbody id="tablaUsuarios"></tbody>
+
+</table>
+
+</div>
+
+<!-- EXPEDICION -->
+
+<div id="expedicion" class="section active">
+
+<h2>Expedición</h2>
+
+<div class="form-grid">
+
+<input type="text"
+id="camion"
+placeholder="Camión">
+
+<input type="text"
+id="mercaderiaExp"
+placeholder="Mercadería">
+
+<input type="number"
+id="pesoExp"
+placeholder="Peso">
+
+</div>
+
+<button class="action"
+onclick="agregarExpedicion()">
+Registrar Salida
+</button>
+
+<button class="pdf"
+onclick="descargarPDFExpedicion()">
+Descargar PDF
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Fecha</th>
+<th>Camión</th>
+<th>Mercadería</th>
+<th>Peso</th>
+<th>Usuario</th>
+<th>Acción</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tablaExpedicion"></tbody>
+
+</table>
+
+</div>
+
+<!-- CONTABLE -->
+
+<div id="contable" class="section">
+
+<h2>Contable</h2>
+
+<div class="form-grid">
+
+<select id="tipoMovimiento">
+
+<option value="Cobro">
+Cobro
+</option>
+
+<option value="Gasto">
+Gasto
+</option>
+
+</select>
+
+<input type="number"
+id="montoContable"
+placeholder="Monto">
+
+</div>
+
+<button class="action"
+onclick="registrarMovimiento()">
+Registrar Movimiento
+</button>
+
+<button class="pdf"
+onclick="descargarPDFContable()">
+Descargar PDF
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Fecha</th>
+<th>Tipo</th>
+<th>Monto</th>
+<th>Usuario</th>
+<th>Acción</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tablaContable"></tbody>
+
+</table>
+
+<div class="card-total"
+id="balanceTotal">
+Balance Total: $0
+</div>
+
+</div>
+
+<!-- STOCK -->
+
+<div id="stock" class="section">
+
+<h2>Stock</h2>
+
+<div class="form-grid">
+
+<input type="text"
+id="mercaderiaStock"
+placeholder="Mercadería">
+
+<input type="number"
+id="pesoStock"
+placeholder="Peso">
+
+</div>
+
+<button class="action"
+onclick="agregarStock()">
+Agregar Stock
+</button>
+
+<button class="pdf"
+onclick="descargarPDFStock()">
+Descargar PDF
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Mercadería</th>
+<th>Peso</th>
+<th>Acción</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tablaStock"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="footer">
+© 2026 Costillares Nahuelito
+</div>
+
+<script>
+
+const { jsPDF } = window.jspdf;
+
+/* USUARIOS */
+
+let usuarios = JSON.parse(
+localStorage.getItem('usuarios')
+) || [
+
+{
+usuario:'admin',
+password:'050526',
+rol:'admin'
+}
+
+];
+
+localStorage.setItem(
+'usuarios',
+JSON.stringify(usuarios)
+);
+
+/* DATOS */
+
+let stock = JSON.parse(
+localStorage.getItem('stock')
+) || [];
+
+let expediciones = JSON.parse(
+localStorage.getItem('expediciones')
+) || [];
+
+let movimientos = JSON.parse(
+localStorage.getItem('movimientos')
+) || [];
+
+let usuarioActivo = null;
+
+/* GUARDAR */
+
+function guardarDatos(){
+
+localStorage.setItem(
+'stock',
+JSON.stringify(stock)
+);
+
+localStorage.setItem(
+'expediciones',
+JSON.stringify(expediciones)
+);
+
+localStorage.setItem(
+'movimientos',
+JSON.stringify(movimientos)
+);
+
+localStorage.setItem(
+'usuarios',
+JSON.stringify(usuarios)
+);
+
+}
+
+/* FECHA */
+
+function fechaHoraActual(){
+
+return new Date().toLocaleString();
+
+}
+
+/* LOGIN */
+
+function login(){
+
+const user =
+document.getElementById(
+'loginUser'
+).value.trim();
+
+const pass =
+document.getElementById(
+'loginPass'
+).value.trim();
 
 const encontrado =
 usuarios.find(u =>
@@ -1344,9 +1949,24 @@ document.getElementById(
 ).innerText =
 usuarioActivo.usuario;
 
+/* ADMIN */
+
+if(usuarioActivo.rol === 'admin'){
+
+document.getElementById(
+'btnAdmin'
+).style.display='inline-block';
+
 }
 
-/* ================= LOGOUT ================= */
+alert(
+'Bienvenido ' +
+usuarioActivo.usuario
+);
+
+}
+
+/* LOGOUT */
 
 function logout(){
 
@@ -1354,7 +1974,23 @@ location.reload();
 
 }
 
-/* ================= ADMIN ================= */
+/* NAVEGACION */
+
+function showSection(id){
+
+document.querySelectorAll('.section')
+.forEach(sec => {
+
+sec.classList.remove('active');
+
+});
+
+document.getElementById(id)
+.classList.add('active');
+
+}
+
+/* ADMIN */
 
 function crearUsuario(){
 
@@ -1382,7 +2018,7 @@ document.getElementById(
 
 if(!usuario || !password){
 
-alert('Complete los datos');
+alert('Complete datos');
 return;
 
 }
@@ -1394,6 +2030,8 @@ password,
 rol
 
 });
+
+guardarDatos();
 
 renderUsuarios();
 
@@ -1445,29 +2083,15 @@ if(confirm('Eliminar usuario?')){
 
 usuarios.splice(index,1);
 
+guardarDatos();
+
 renderUsuarios();
 
 }
 
 }
 
-/* ================= NAVEGACION ================= */
-
-function showSection(id){
-
-document.querySelectorAll('.section')
-.forEach(sec => {
-
-sec.classList.remove('active');
-
-});
-
-document.getElementById(id)
-.classList.add('active');
-
-}
-
-/* ================= STOCK ================= */
+/* STOCK */
 
 function agregarStock(){
 
@@ -1502,10 +2126,8 @@ existente.peso += peso;
 }else{
 
 stock.push({
-
 nombre,
 peso
-
 });
 
 }
@@ -1568,7 +2190,7 @@ renderStock();
 
 }
 
-/* ================= EXPEDICION ================= */
+/* EXPEDICION */
 
 function agregarExpedicion(){
 
@@ -1701,7 +2323,7 @@ renderStock();
 
 }
 
-/* ================= CONTABLE ================= */
+/* CONTABLE */
 
 function registrarMovimiento(){
 
@@ -1804,30 +2426,22 @@ renderMovimientos();
 
 }
 
-/* ================= PDF STOCK ================= */
+/* PDF STOCK */
 
 function descargarPDFStock(){
 
 const doc = new jsPDF();
 
-doc.text(
-'Reporte de Stock',
-10,
-10
-);
+doc.text('Reporte Stock',10,10);
 
 let y = 20;
 
 stock.forEach(s=>{
 
 doc.text(
-
 `${s.nombre} - ${s.peso} kg`,
-
 10,
-
 y
-
 );
 
 y += 10;
@@ -1838,30 +2452,22 @@ doc.save('stock.pdf');
 
 }
 
-/* ================= PDF EXPEDICION ================= */
+/* PDF EXPEDICION */
 
 function descargarPDFExpedicion(){
 
 const doc = new jsPDF();
 
-doc.text(
-'Reporte Expedicion',
-10,
-10
-);
+doc.text('Reporte Expedicion',10,10);
 
 let y = 20;
 
 expediciones.forEach(e=>{
 
 doc.text(
-
-`${e.fecha} | ${e.camion} | ${e.mercaderia} | ${e.peso}kg | ${e.usuario}`,
-
+`${e.fecha} | ${e.camion} | ${e.mercaderia} | ${e.peso}kg`,
 10,
-
 y
-
 );
 
 y += 10;
@@ -1872,30 +2478,22 @@ doc.save('expedicion.pdf');
 
 }
 
-/* ================= PDF CONTABLE ================= */
+/* PDF CONTABLE */
 
 function descargarPDFContable(){
 
 const doc = new jsPDF();
 
-doc.text(
-'Reporte Contable',
-10,
-10
-);
+doc.text('Reporte Contable',10,10);
 
 let y = 20;
 
 movimientos.forEach(m=>{
 
 doc.text(
-
-`${m.fecha} | ${m.tipo} | $${m.monto} | ${m.usuario}`,
-
+`${m.fecha} | ${m.tipo} | $${m.monto}`,
 10,
-
 y
-
 );
 
 y += 10;
@@ -1906,11 +2504,12 @@ doc.save('contable.pdf');
 
 }
 
-/* ================= INIT ================= */
+/* INIT */
 
 renderStock();
 renderExpediciones();
 renderMovimientos();
+renderUsuarios();
 
 </script>
 
